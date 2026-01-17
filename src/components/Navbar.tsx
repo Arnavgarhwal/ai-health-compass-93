@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Activity, ChevronDown } from "lucide-react";
+import { Menu, X, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const navItems = [
-  { label: "Symptom Analyzer", href: "#symptoms" },
-  { label: "Consultations", href: "#consultations" },
-  { label: "Services", href: "#services" },
-  { label: "Health Blog", href: "#blog" },
+  { label: "Symptom Analyzer", href: "/symptom-analyzer" },
+  { label: "Consultations", href: "/consultations" },
+  { label: "Diagnostics", href: "/diagnostics" },
+  { label: "Medicines", href: "/medicines" },
+  { label: "Disease Library", href: "/diseases" },
 ];
 
 const Navbar = () => {
@@ -18,25 +20,25 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-health-teal-dark flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <Activity className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground">
               Health<span className="text-primary">AI</span>
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
-                className="text-muted-foreground hover:text-primary font-medium transition-colors"
+                to={item.href}
+                className="text-muted-foreground hover:text-primary font-medium transition-colors text-sm"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -71,14 +73,14 @@ const Navbar = () => {
           >
             <div className="container mx-auto px-4 py-4 space-y-3">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.label}
-                  href={item.href}
+                  to={item.href}
                   className="block py-2 text-muted-foreground hover:text-primary font-medium transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
               <div className="pt-4 space-y-2">
                 <Button variant="outline" className="w-full">
