@@ -52,12 +52,16 @@ const Navbar = () => {
                 <User className="w-4 h-4" />
               </Button>
             </Link>
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button variant="hero" size="sm">
-              Get Started
-            </Button>
+            <Link to="/auth">
+              <Button variant="ghost" size="sm">
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button variant="hero" size="sm">
+                Get Started
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -101,12 +105,16 @@ const Navbar = () => {
                 Dashboard
               </Link>
               <div className="pt-4 space-y-2">
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-                <Button variant="hero" className="w-full">
-                  Get Started
-                </Button>
+                <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Button variant="outline" className="w-full">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Button variant="hero" className="w-full">
+                    Get Started
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.div>

@@ -11,6 +11,9 @@ import Consultations from "./pages/Consultations";
 import SymptomAnalyzer from "./pages/SymptomAnalyzer";
 import Blog from "./pages/Blog";
 import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/Auth";
+import HealthRecords from "./pages/HealthRecords";
+import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const App = () => (
           <Route path="/symptom-analyzer" element={<SymptomAnalyzer />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/health-records" element={<HealthRecords />} />
+          <Route path="/profile" element={<ProfileSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

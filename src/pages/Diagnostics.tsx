@@ -164,7 +164,7 @@ const Diagnostics = () => {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">${test.price.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-primary">₹{(test.price * 83).toFixed(0)}</span>
                   <Button 
                     variant="hero" 
                     size="sm"
@@ -202,7 +202,7 @@ const Diagnostics = () => {
                 <div className="text-4xl">{selectedTest.image}</div>
                 <div>
                   <h2 className="text-xl font-bold">{selectedTest.name}</h2>
-                  <p className="text-primary font-semibold">${selectedTest.price.toFixed(2)}</p>
+                  <p className="text-primary font-semibold">₹{(selectedTest.price * 83).toFixed(0)}</p>
                 </div>
               </div>
             </div>

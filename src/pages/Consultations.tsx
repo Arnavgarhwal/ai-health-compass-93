@@ -141,7 +141,7 @@ const Consultations = () => {
                 <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div>
                     <p className="text-sm text-muted-foreground">Consultation Fee</p>
-                    <p className="text-xl font-bold text-primary">${doctor.consultationFee}</p>
+                    <p className="text-xl font-bold text-primary">₹{doctor.consultationFee * 83}</p>
                   </div>
                   <Button variant="hero" onClick={() => setSelectedDoctor(doctor)}>
                     Book Now
@@ -179,7 +179,7 @@ const Consultations = () => {
                 <div>
                   <h2 className="text-xl font-bold">{selectedDoctor.name}</h2>
                   <Badge variant="secondary">{selectedDoctor.specialty}</Badge>
-                  <p className="text-primary font-semibold mt-1">${selectedDoctor.consultationFee}</p>
+                  <p className="text-primary font-semibold mt-1">₹{selectedDoctor.consultationFee * 83}</p>
                 </div>
               </div>
             </div>
@@ -244,15 +244,15 @@ const Consultations = () => {
               <div className="p-4 rounded-xl bg-accent/50 border border-border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-muted-foreground">Consultation Fee</span>
-                  <span className="font-semibold">${selectedDoctor.consultationFee}</span>
+                  <span className="font-semibold">₹{selectedDoctor.consultationFee * 83}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Platform Fee</span>
-                  <span className="font-semibold">$0</span>
+                  <span className="font-semibold">₹0</span>
                 </div>
                 <div className="flex items-center justify-between pt-2 mt-2 border-t border-border">
                   <span className="font-semibold">Total</span>
-                  <span className="font-bold text-primary">${selectedDoctor.consultationFee}</span>
+                  <span className="font-bold text-primary">₹{selectedDoctor.consultationFee * 83}</span>
                 </div>
               </div>
 
