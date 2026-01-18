@@ -396,7 +396,7 @@ const Dashboard = () => {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="font-semibold text-foreground">
-                            ${order.total.toFixed(2)}
+                            ₹{(order.total * 83).toFixed(0)}
                           </span>
                           <Badge className={getStatusBadge(order.status)}>
                             {order.status}

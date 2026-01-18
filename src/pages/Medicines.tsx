@@ -172,7 +172,7 @@ const Medicines = () => {
                 <p className="text-xs text-muted-foreground mb-4">Dosage: {medicine.dosage}</p>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">${medicine.price.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-primary">₹{(medicine.price * 83).toFixed(0)}</span>
                   <Button
                     size="sm"
                     variant={medicine.inStock ? "hero" : "outline"}
@@ -232,7 +232,7 @@ const Medicines = () => {
                         <div className="text-3xl">{item.image}</div>
                         <div className="flex-1">
                           <h4 className="font-medium">{item.name}</h4>
-                          <p className="text-primary font-semibold">${item.price.toFixed(2)}</p>
+                          <p className="text-primary font-semibold">₹{(item.price * 83).toFixed(0)}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Button 
@@ -270,7 +270,7 @@ const Medicines = () => {
                 <div className="p-6 border-t border-border space-y-4">
                   <div className="flex items-center justify-between text-lg font-semibold">
                     <span>Total</span>
-                    <span className="text-primary">${totalPrice.toFixed(2)}</span>
+                    <span className="text-primary">₹{(totalPrice * 83).toFixed(0)}</span>
                   </div>
                   <Button variant="hero" className="w-full" size="lg">
                     Proceed to Checkout
