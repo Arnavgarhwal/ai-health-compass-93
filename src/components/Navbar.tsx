@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Activity } from "lucide-react";
+import { Menu, X, Activity, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { label: "Symptom Analyzer", href: "/symptom-analyzer" },
@@ -10,6 +11,7 @@ const navItems = [
   { label: "Diagnostics", href: "/diagnostics" },
   { label: "Medicines", href: "/medicines" },
   { label: "Disease Library", href: "/diseases" },
+  { label: "Blog", href: "/blog" },
 ];
 
 const Navbar = () => {
@@ -30,7 +32,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-5">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -43,7 +45,13 @@ const Navbar = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
+            <Link to="/dashboard">
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <User className="w-4 h-4" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm">
               Sign In
             </Button>
@@ -53,12 +61,15 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-lg hover:bg-accent transition-colors"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -82,6 +93,13 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
+              <Link
+                to="/dashboard"
+                className="block py-2 text-muted-foreground hover:text-primary font-medium transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
               <div className="pt-4 space-y-2">
                 <Button variant="outline" className="w-full">
                   Sign In
