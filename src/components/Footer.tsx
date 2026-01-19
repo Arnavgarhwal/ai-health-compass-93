@@ -49,7 +49,7 @@ const Footer = () => {
                 <Activity className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold">
-                Health<span className="text-primary">AI</span>
+                Well<span className="text-primary">Sync</span>
               </span>
             </a>
             <p className="text-background/60 text-sm mb-6 max-w-xs">
@@ -138,7 +138,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-background/60">
-            © 2024 HealthAI. All rights reserved.
+            © 2024 WellSync. All rights reserved.
           </p>
           <p className="text-xs text-background/40">
             Medical Disclaimer: This platform provides general health information and is not a 

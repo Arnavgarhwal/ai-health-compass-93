@@ -37,7 +37,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const checkAuth = () => {
-      const userData = localStorage.getItem("healthai-user");
+      const userData = localStorage.getItem("wellsync-user");
       if (userData) {
         const parsed = JSON.parse(userData);
         if (parsed.isLoggedIn) {
@@ -63,11 +63,11 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    const userData = localStorage.getItem("healthai-user");
+    const userData = localStorage.getItem("wellsync-user");
     if (userData) {
       const parsed = JSON.parse(userData);
       parsed.isLoggedIn = false;
-      localStorage.setItem("healthai-user", JSON.stringify(parsed));
+      localStorage.setItem("wellsync-user", JSON.stringify(parsed));
     }
     setUser(null);
     window.dispatchEvent(new Event("auth-change"));
@@ -92,7 +92,7 @@ const Navbar = () => {
               <Activity className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground">
-              Health<span className="text-primary">AI</span>
+              Well<span className="text-primary">Sync</span>
             </span>
           </Link>
 
