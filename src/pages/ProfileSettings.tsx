@@ -18,6 +18,8 @@ import {
   MessageSquare,
   Heart,
   Save,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,17 +53,23 @@ interface NotificationSettings {
   reminderTime: string;
 }
 
+interface PasswordForm {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 const ProfileSettings = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile>({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+91 98765 43210",
-    dateOfBirth: "1990-05-15",
-    gender: "Male",
-    address: "123 Health Street, Mumbai, Maharashtra 400001",
-    bloodGroup: "O+",
-    emergencyContact: "+91 98765 12345",
+    name: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    address: "",
+    bloodGroup: "",
+    emergencyContact: "",
     avatarEmoji: "👤",
   });
 
@@ -75,22 +83,36 @@ const ProfileSettings = () => {
     reminderTime: "24",
   });
 
+  const [passwordForm, setPasswordForm] = useState<PasswordForm>({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [showPasswords, setShowPasswords] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem("healthai-profile");
-    const savedNotifications = localStorage.getItem("healthai-notifications");
-    const savedUser = localStorage.getItem("healthai-user");
+    // Load profile from localStorage
+    const savedProfile = localStorage.getItem("wellsync-profile");
+    const savedNotifications = localStorage.getItem("wellsync-notifications");
+    const savedUser = localStorage.getItem("wellsync-user");
 
     if (savedProfile) {
-      setProfile(JSON.parse(savedProfile));
+      const profileData = JSON.parse(savedProfile);
+      setProfile(profileData);
+      setOriginalProfile(profileData);
     } else if (savedUser) {
       const user = JSON.parse(savedUser);
-      setProfile((prev) => ({
-        ...prev,
-        name: user.name || prev.name,
-        email: user.email || prev.email,
-      }));
+      const newProfile = {
+        ...profile,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      };
+      setProfile(newProfile);
+      setOriginalProfile(newProfile);
     }
 
     if (savedNotifications) {
@@ -99,34 +121,167 @@ const ProfileSettings = () => {
   }, []);
 
   const handleSaveProfile = () => {
-    localStorage.setItem("healthai-profile", JSON.stringify(profile));
-    localStorage.setItem("healthai-user", JSON.stringify({
-      name: profile.name,
-      email: profile.email,
-      isLoggedIn: true
-    }));
+    // Validation
+    if (!profile.name.trim()) {
+      toast({
+        title: "Name Required",
+        description: "Please enter your name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Save to localStorage
+    localStorage.setItem("wellsync-profile", JSON.stringify(profile));
+    
+    // Also update the user session
+    const savedUser = localStorage.getItem("wellsync-user");
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      user.name = profile.name;
+      user.email = profile.email;
+      user.phone = profile.phone;
+      localStorage.setItem("wellsync-user", JSON.stringify(user));
+      
+      // Update registered users as well
+      const registeredUsers = JSON.parse(localStorage.getItem("wellsync-registered-users") || "[]");
+      const updatedUsers = registeredUsers.map((u: any) => 
+        u.phone === user.phone ? { ...u, name: profile.name, email: profile.email } : u
+      );
+      localStorage.setItem("wellsync-registered-users", JSON.stringify(updatedUsers));
+    }
+
+    setOriginalProfile(profile);
     setIsEditing(false);
+    
+    // Trigger auth change for navbar update
+    window.dispatchEvent(new Event("auth-change"));
+    
     toast({
       title: "Profile Updated",
       description: "Your profile has been saved successfully.",
     });
   };
 
+  const handleCancelEdit = () => {
+    if (originalProfile) {
+      setProfile(originalProfile);
+    }
+    setIsEditing(false);
+  };
+
   const handleSaveNotifications = () => {
-    localStorage.setItem("healthai-notifications", JSON.stringify(notifications));
+    localStorage.setItem("wellsync-notifications", JSON.stringify(notifications));
     toast({
       title: "Preferences Saved",
       description: "Your notification preferences have been updated.",
     });
   };
 
+  const handleChangePassword = () => {
+    // Validation
+    if (!passwordForm.currentPassword) {
+      toast({
+        title: "Current Password Required",
+        description: "Please enter your current password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "New password must be at least 6 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "New passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verify current password
+    const savedUser = localStorage.getItem("wellsync-user");
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      const registeredUsers = JSON.parse(localStorage.getItem("wellsync-registered-users") || "[]");
+      const registeredUser = registeredUsers.find((u: any) => u.phone === user.phone);
+
+      if (registeredUser && registeredUser.password !== passwordForm.currentPassword) {
+        toast({
+          title: "Incorrect Password",
+          description: "The current password you entered is incorrect.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update password
+      const updatedUsers = registeredUsers.map((u: any) => 
+        u.phone === user.phone ? { ...u, password: passwordForm.newPassword } : u
+      );
+      localStorage.setItem("wellsync-registered-users", JSON.stringify(updatedUsers));
+
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      toast({
+        title: "Password Updated",
+        description: "Your password has been changed successfully.",
+      });
+    }
+  };
+
   const handleLogout = () => {
-    localStorage.removeItem("healthai-user");
+    const userData = localStorage.getItem("wellsync-user");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      parsed.isLoggedIn = false;
+      localStorage.setItem("wellsync-user", JSON.stringify(parsed));
+    }
+    
+    window.dispatchEvent(new Event("auth-change"));
+    
     toast({
       title: "Logged Out",
       description: "You have been logged out successfully.",
     });
     navigate("/auth");
+  };
+
+  const handleDeleteAccount = () => {
+    const savedUser = localStorage.getItem("wellsync-user");
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      
+      // Remove user from registered users
+      const registeredUsers = JSON.parse(localStorage.getItem("wellsync-registered-users") || "[]");
+      const updatedUsers = registeredUsers.filter((u: any) => u.phone !== user.phone);
+      localStorage.setItem("wellsync-registered-users", JSON.stringify(updatedUsers));
+      
+      // Clear all user data
+      localStorage.removeItem("wellsync-user");
+      localStorage.removeItem("wellsync-profile");
+      localStorage.removeItem("wellsync-notifications");
+      
+      window.dispatchEvent(new Event("auth-change"));
+      
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been deleted successfully.",
+      });
+      navigate("/");
+    }
   };
 
   const avatarOptions = ["👤", "👨", "👩", "🧑", "👨‍⚕️", "👩‍⚕️", "🧑‍💼", "😊"];
@@ -206,29 +361,28 @@ const ProfileSettings = () => {
                       )}
                     </div>
                     <div className="flex-1 text-center md:text-left">
-                      <h2 className="text-2xl font-bold">{profile.name}</h2>
-                      <p className="text-muted-foreground">{profile.email}</p>
+                      <h2 className="text-2xl font-bold">{profile.name || "Your Name"}</h2>
+                      <p className="text-muted-foreground">{profile.email || profile.phone || "Add your details"}</p>
                       <Badge className="mt-2 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                         <Check className="w-3 h-3 mr-1" /> Verified Account
                       </Badge>
                     </div>
-                    <Button
-                      variant={isEditing ? "hero" : "outline"}
-                      onClick={() => {
-                        if (isEditing) handleSaveProfile();
-                        else setIsEditing(true);
-                      }}
-                    >
+                    <div className="flex gap-2">
                       {isEditing ? (
                         <>
-                          <Save className="w-4 h-4 mr-2" /> Save Changes
+                          <Button variant="hero" onClick={handleSaveProfile}>
+                            <Save className="w-4 h-4 mr-2" /> Save
+                          </Button>
+                          <Button variant="outline" onClick={handleCancelEdit}>
+                            Cancel
+                          </Button>
                         </>
                       ) : (
-                        <>
+                        <Button variant="outline" onClick={() => setIsEditing(true)}>
                           <Camera className="w-4 h-4 mr-2" /> Edit Profile
-                        </>
+                        </Button>
                       )}
-                    </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -251,6 +405,7 @@ const ProfileSettings = () => {
                           }
                           className="pl-9"
                           disabled={!isEditing}
+                          placeholder="Enter your name"
                         />
                       </div>
                     </div>
@@ -267,6 +422,7 @@ const ProfileSettings = () => {
                           }
                           className="pl-9"
                           disabled={!isEditing}
+                          placeholder="your@email.com"
                         />
                       </div>
                     </div>
@@ -283,6 +439,7 @@ const ProfileSettings = () => {
                           }
                           className="pl-9"
                           disabled={!isEditing}
+                          placeholder="+91 98765 43210"
                         />
                       </div>
                     </div>
@@ -315,6 +472,7 @@ const ProfileSettings = () => {
                         }
                         disabled={!isEditing}
                       >
+                        <option value="">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
@@ -335,6 +493,7 @@ const ProfileSettings = () => {
                           }
                           disabled={!isEditing}
                         >
+                          <option value="">Select Blood Group</option>
                           <option value="A+">A+</option>
                           <option value="A-">A-</option>
                           <option value="B+">B+</option>
@@ -360,6 +519,7 @@ const ProfileSettings = () => {
                         }
                         className="pl-9"
                         disabled={!isEditing}
+                        placeholder="Enter your address"
                       />
                     </div>
                   </div>
@@ -547,21 +707,66 @@ const ProfileSettings = () => {
                       <label className="text-sm text-muted-foreground mb-1 block">
                         Current Password
                       </label>
-                      <Input type="password" placeholder="••••••••" />
+                      <div className="relative">
+                        <Input
+                          type={showPasswords ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={passwordForm.currentPassword}
+                          onChange={(e) =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              currentPassword: e.target.value,
+                            })
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          onClick={() => setShowPasswords(!showPasswords)}
+                        >
+                          {showPasswords ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="text-sm text-muted-foreground mb-1 block">
                         New Password
                       </label>
-                      <Input type="password" placeholder="••••••••" />
+                      <Input
+                        type={showPasswords ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={passwordForm.newPassword}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            newPassword: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                     <div>
                       <label className="text-sm text-muted-foreground mb-1 block">
                         Confirm New Password
                       </label>
-                      <Input type="password" placeholder="••••••••" />
+                      <Input
+                        type={showPasswords ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                      />
                     </div>
-                    <Button variant="hero">Update Password</Button>
+                    <Button variant="hero" onClick={handleChangePassword}>
+                      Update Password
+                    </Button>
                   </div>
                 </div>
 
@@ -606,7 +811,9 @@ const ProfileSettings = () => {
                   <p className="text-sm text-muted-foreground mb-4">
                     Once you delete your account, there is no going back.
                   </p>
-                  <Button variant="destructive">Delete Account</Button>
+                  <Button variant="destructive" onClick={handleDeleteAccount}>
+                    Delete Account
+                  </Button>
                 </div>
               </motion.div>
             </TabsContent>

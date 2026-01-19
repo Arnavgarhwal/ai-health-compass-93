@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Activity, Mail, Lock, User, Eye, EyeOff, ArrowRight, Check, Phone } from "lucide-react";
+import { Activity, Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowLeft, Check, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +30,7 @@ const Auth = () => {
 
   // Check if user is already logged in
   useEffect(() => {
-    const userData = localStorage.getItem("healthai-user");
+    const userData = localStorage.getItem("wellsync-user");
     if (userData) {
       const user = JSON.parse(userData);
       if (user.isLoggedIn) {
@@ -95,7 +95,7 @@ const Auth = () => {
       }
 
       // Check if phone already exists
-      const existingUsers = JSON.parse(localStorage.getItem("healthai-registered-users") || "[]");
+      const existingUsers = JSON.parse(localStorage.getItem("wellsync-registered-users") || "[]");
       const phoneExists = existingUsers.find((u: StoredUser) => u.phone === formData.phone);
       
       if (phoneExists) {
@@ -118,8 +118,11 @@ const Auth = () => {
       };
 
       existingUsers.push(newUser);
-      localStorage.setItem("healthai-registered-users", JSON.stringify(existingUsers));
-      localStorage.setItem("healthai-user", JSON.stringify(newUser));
+      localStorage.setItem("wellsync-registered-users", JSON.stringify(existingUsers));
+      localStorage.setItem("wellsync-user", JSON.stringify(newUser));
+
+      // Trigger auth change event
+      window.dispatchEvent(new Event("auth-change"));
 
       toast({
         title: "Account Created!",
@@ -149,7 +152,7 @@ const Auth = () => {
       }
 
       // Check credentials
-      const existingUsers = JSON.parse(localStorage.getItem("healthai-registered-users") || "[]");
+      const existingUsers = JSON.parse(localStorage.getItem("wellsync-registered-users") || "[]");
       const user = existingUsers.find((u: StoredUser) => u.phone === formData.phone);
 
       if (!user) {
@@ -175,8 +178,11 @@ const Auth = () => {
       const updatedUsers = existingUsers.map((u: StoredUser) => 
         u.phone === formData.phone ? user : u
       );
-      localStorage.setItem("healthai-registered-users", JSON.stringify(updatedUsers));
-      localStorage.setItem("healthai-user", JSON.stringify(user));
+      localStorage.setItem("wellsync-registered-users", JSON.stringify(updatedUsers));
+      localStorage.setItem("wellsync-user", JSON.stringify(user));
+
+      // Trigger auth change event
+      window.dispatchEvent(new Event("auth-change"));
 
       toast({
         title: "Welcome back!",
@@ -195,6 +201,10 @@ const Auth = () => {
       description: "Google authentication requires backend integration. Please use phone/password for this demo.",
       variant: "default"
     });
+  };
+
+  const handleBack = () => {
+    navigate("/");
   };
 
   const features = [
@@ -218,7 +228,7 @@ const Auth = () => {
               <Activity className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-2xl font-bold text-foreground">
-              Health<span className="text-primary">AI</span>
+              Well<span className="text-primary">Sync</span>
             </span>
           </Link>
         </div>
@@ -229,7 +239,7 @@ const Auth = () => {
               Your Health Journey Starts Here
             </h1>
             <p className="text-lg text-muted-foreground">
-              Join thousands of users who trust HealthAI for their healthcare needs.
+              Join thousands of users who trust WellSync for their healthcare needs.
             </p>
           </div>
 
@@ -257,7 +267,18 @@ const Auth = () => {
       </div>
 
       {/* Right Side - Auth Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-8 relative">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="absolute top-4 left-4 gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Button>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -270,7 +291,7 @@ const Auth = () => {
                 <Activity className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">
-                Health<span className="text-primary">AI</span>
+                Well<span className="text-primary">Sync</span>
               </span>
             </Link>
           </div>

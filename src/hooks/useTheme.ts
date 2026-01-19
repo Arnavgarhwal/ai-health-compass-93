@@ -4,7 +4,7 @@ type Theme = 'light' | 'dark' | 'system';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('healthai-theme') as Theme;
+    const saved = localStorage.getItem('wellsync-theme') as Theme;
     return saved || 'system';
   });
 

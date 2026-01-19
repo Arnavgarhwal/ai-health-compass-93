@@ -10,12 +10,12 @@ export interface CartItem {
 
 export const useCart = () => {
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('healthai-cart');
+    const saved = localStorage.getItem('wellsync-cart');
     return saved ? JSON.parse(saved) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem('healthai-cart', JSON.stringify(cart));
+    localStorage.setItem('wellsync-cart', JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
