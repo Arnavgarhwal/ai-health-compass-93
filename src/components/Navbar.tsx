@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Activity, User } from "lucide-react";
+import { Menu, X, Activity, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { toast } from "@/hooks/use-toast";
 
 const navItems = [
   { label: "Symptom Analyzer", href: "/symptom-analyzer" },
@@ -14,8 +23,64 @@ const navItems = [
   { label: "Blog", href: "/blog" },
 ];
 
+interface UserData {
+  name: string;
+  email?: string;
+  phone: string;
+  isLoggedIn: boolean;
+}
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<UserData | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const userData = localStorage.getItem("healthai-user");
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        if (parsed.isLoggedIn) {
+          setUser(parsed);
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    checkAuth();
+    // Listen for storage changes
+    window.addEventListener("storage", checkAuth);
+    // Custom event for same-tab updates
+    window.addEventListener("auth-change", checkAuth);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("auth-change", checkAuth);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    const userData = localStorage.getItem("healthai-user");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      parsed.isLoggedIn = false;
+      localStorage.setItem("healthai-user", JSON.stringify(parsed));
+    }
+    setUser(null);
+    window.dispatchEvent(new Event("auth-change"));
+    toast({
+      title: "Logged Out",
+      description: "You have been logged out successfully."
+    });
+    navigate("/");
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -47,21 +112,65 @@ const Navbar = () => {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle />
-            <Link to="/dashboard">
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <User className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button variant="ghost" size="sm">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button variant="hero" size="sm">
-                Get Started
-              </Button>
-            </Link>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                        {getInitials(user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium text-foreground">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.phone}</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/health-records" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Health Records
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button variant="hero" size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -97,24 +206,73 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                to="/dashboard"
-                className="block py-2 text-muted-foreground hover:text-primary font-medium transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
+              
+              {user && (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="block py-2 text-muted-foreground hover:text-primary font-medium transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/vitals"
+                    className="block py-2 text-muted-foreground hover:text-primary font-medium transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Health Vitals
+                  </Link>
+                  <Link
+                    to="/family"
+                    className="block py-2 text-muted-foreground hover:text-primary font-medium transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Family Health
+                  </Link>
+                </>
+              )}
+              
               <div className="pt-4 space-y-2">
-                <Link to="/auth" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/auth" onClick={() => setIsOpen(false)}>
-                  <Button variant="hero" className="w-full">
-                    Get Started
-                  </Button>
-                </Link>
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-3 py-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-foreground text-sm">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">{user.phone}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => {
+                        handleLogout();
+                        setIsOpen(false);
+                      }}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" className="w-full">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link to="/auth" onClick={() => setIsOpen(false)}>
+                      <Button variant="hero" className="w-full">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
