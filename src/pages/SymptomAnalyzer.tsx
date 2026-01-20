@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { symptomResponses } from "@/data/mockData";
+import { symptomResponses, commonSymptoms } from "@/data/symptoms";
 
 interface Message {
   id: number;
@@ -20,7 +20,8 @@ interface Message {
   };
 }
 
-const commonSymptoms = ["Headache", "Fever", "Cough", "Fatigue", "Nausea", "Dizziness", "Stomach Pain", "Chest Pain"];
+// Use first 12 common symptoms for quick buttons
+const quickSymptoms = commonSymptoms.slice(0, 12);
 
 const SymptomAnalyzer = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -126,7 +127,7 @@ const SymptomAnalyzer = () => {
 
           {/* Quick Symptoms */}
           <div className="flex flex-wrap gap-2 justify-center mb-6">
-            {commonSymptoms.map(symptom => (
+            {quickSymptoms.map(symptom => (
               <Button
                 key={symptom}
                 variant="outline"

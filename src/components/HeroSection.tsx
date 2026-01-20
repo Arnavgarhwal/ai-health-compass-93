@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -54,13 +55,17 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
-            <Button variant="hero" size="xl" className="group">
-              Analyze Symptoms Now
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" size="xl">
-              Book Consultation
-            </Button>
+            <Link to="/symptom-analyzer">
+              <Button variant="hero" size="xl" className="group">
+                Analyze Symptoms Now
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link to="/consultations">
+              <Button variant="outline" size="xl">
+                Book Consultation
+              </Button>
+            </Link>
           </motion.div>
 
           {/* Trust Indicators */}
