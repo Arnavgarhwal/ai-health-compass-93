@@ -275,7 +275,27 @@ const Medicines = () => {
                   <Button variant="hero" className="w-full" size="lg">
                     Proceed to Checkout
                   </Button>
-                  <Button variant="outline" className="w-full" onClick={clearCart}>
+                  <a 
+                    href="https://www.1mg.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button variant="outline" className="w-full">
+                      Buy from 1mg Pharmacy
+                    </Button>
+                  </a>
+                  <a 
+                    href="https://www.apollopharmacy.in" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button variant="outline" className="w-full">
+                      Buy from Apollo Pharmacy
+                    </Button>
+                  </a>
+                  <Button variant="ghost" className="w-full" onClick={clearCart}>
                     Clear Cart
                   </Button>
                 </div>

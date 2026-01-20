@@ -18,6 +18,8 @@ import VitalsTracker from "./pages/VitalsTracker";
 import FamilyHealth from "./pages/FamilyHealth";
 import EmergencySOS from "./pages/EmergencySOS";
 import MedicineReminder from "./pages/MedicineReminder";
+import BMICalculator from "./pages/BMICalculator";
+import NearbyHospitals from "./pages/NearbyHospitals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +46,8 @@ const App = () => (
           <Route path="/family" element={<FamilyHealth />} />
           <Route path="/emergency" element={<EmergencySOS />} />
           <Route path="/medicine-reminders" element={<MedicineReminder />} />
+          <Route path="/bmi-calculator" element={<BMICalculator />} />
+          <Route path="/nearby-hospitals" element={<NearbyHospitals />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

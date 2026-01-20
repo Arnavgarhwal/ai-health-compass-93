@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Activity, User, LogOut } from "lucide-react";
+import { Menu, X, Activity, User, LogOut, AlertTriangle, Bell, Heart, Calculator, MapPin, FileText, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -146,8 +146,45 @@ const Navbar = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/health-records" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
+                      <FileText className="mr-2 h-4 w-4" />
                       Health Records
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/vitals" className="cursor-pointer">
+                      <Heart className="mr-2 h-4 w-4" />
+                      Health Vitals
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/bmi-calculator" className="cursor-pointer">
+                      <Calculator className="mr-2 h-4 w-4" />
+                      BMI Calculator
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/family" className="cursor-pointer">
+                      <Users className="mr-2 h-4 w-4" />
+                      Family Health
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/emergency" className="cursor-pointer text-destructive">
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      Emergency SOS
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/medicine-reminders" className="cursor-pointer">
+                      <Bell className="mr-2 h-4 w-4" />
+                      Medicine Reminders
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/nearby-hospitals" className="cursor-pointer">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Nearby Hospitals
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
