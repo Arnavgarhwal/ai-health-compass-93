@@ -13,7 +13,15 @@ import {
   User,
   Settings,
   Bell,
+  Phone,
+  Pill,
+  Calculator,
+  MapPin,
+  Heart,
+  Lightbulb,
+  X,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -47,50 +55,79 @@ interface Order {
   status: "processing" | "shipped" | "delivered";
 }
 
+interface Notification {
+  id: number;
+  type: "reminder" | "tip";
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+}
+
+const quickLinks = [
+  { name: "Emergency SOS", icon: Phone, path: "/emergency", color: "bg-destructive/10 text-destructive", description: "Quick emergency access" },
+  { name: "Medicine Reminders", icon: Pill, path: "/medicine-reminders", color: "bg-primary/10 text-primary", description: "Manage medications" },
+  { name: "BMI Calculator", icon: Calculator, path: "/bmi-calculator", color: "bg-secondary/10 text-secondary", description: "Check your BMI" },
+  { name: "Nearby Hospitals", icon: MapPin, path: "/nearby-hospitals", color: "bg-accent text-accent-foreground", description: "Find hospitals" },
+];
+
+const healthTips = [
+  "Stay hydrated! Aim to drink 8 glasses of water daily.",
+  "Take a 5-minute break every hour to stretch and move.",
+  "Include more leafy greens in your diet for better immunity.",
+  "Get 7-8 hours of quality sleep for optimal health.",
+  "Practice deep breathing exercises to reduce stress.",
+  "Walk at least 10,000 steps daily for heart health.",
+  "Limit screen time before bed for better sleep quality.",
+  "Eat a balanced breakfast to kickstart your metabolism.",
+];
+
 const Dashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     // Load from localStorage or use mock data
-    const savedAppointments = localStorage.getItem("healthai-appointments");
-    const savedResults = localStorage.getItem("healthai-test-results");
-    const savedOrders = localStorage.getItem("healthai-orders");
+    const savedAppointments = localStorage.getItem("wellsync-appointments");
+    const savedResults = localStorage.getItem("wellsync-test-results");
+    const savedOrders = localStorage.getItem("wellsync-orders");
 
-    setAppointments(
-      savedAppointments
-        ? JSON.parse(savedAppointments)
-        : [
-            {
-              id: 1,
-              doctorName: "Dr. Sarah Johnson",
-              specialty: "Cardiologist",
-              date: "2024-01-25",
-              time: "10:00 AM",
-              status: "upcoming",
-              type: "Video Consultation",
-            },
-            {
-              id: 2,
-              doctorName: "Dr. Michael Chen",
-              specialty: "General Physician",
-              date: "2024-01-20",
-              time: "2:30 PM",
-              status: "completed",
-              type: "In-Person",
-            },
-            {
-              id: 3,
-              doctorName: "Dr. Emily Davis",
-              specialty: "Dermatologist",
-              date: "2024-01-28",
-              time: "11:00 AM",
-              status: "upcoming",
-              type: "Video Consultation",
-            },
-          ]
-    );
+    const appointmentsData = savedAppointments
+      ? JSON.parse(savedAppointments)
+      : [
+          {
+            id: 1,
+            doctorName: "Dr. Sarah Johnson",
+            specialty: "Cardiologist",
+            date: "2024-01-25",
+            time: "10:00 AM",
+            status: "upcoming",
+            type: "Video Consultation",
+          },
+          {
+            id: 2,
+            doctorName: "Dr. Michael Chen",
+            specialty: "General Physician",
+            date: "2024-01-20",
+            time: "2:30 PM",
+            status: "completed",
+            type: "In-Person",
+          },
+          {
+            id: 3,
+            doctorName: "Dr. Emily Davis",
+            specialty: "Dermatologist",
+            date: "2024-01-28",
+            time: "11:00 AM",
+            status: "upcoming",
+            type: "Video Consultation",
+          },
+        ];
+
+    setAppointments(appointmentsData);
 
     setTestResults(
       savedResults
@@ -156,7 +193,49 @@ const Dashboard = () => {
             },
           ]
     );
+
+    // Generate notifications based on appointments and health tips
+    const generatedNotifications: Notification[] = [];
+    
+    // Add appointment reminders
+    appointmentsData
+      .filter((apt: Appointment) => apt.status === "upcoming")
+      .forEach((apt: Appointment, index: number) => {
+        generatedNotifications.push({
+          id: index + 1,
+          type: "reminder",
+          title: "Upcoming Appointment",
+          message: `Don't forget your appointment with ${apt.doctorName} on ${new Date(apt.date).toLocaleDateString()} at ${apt.time}`,
+          time: "Today",
+          read: false,
+        });
+      });
+
+    // Add random health tips
+    const randomTips = healthTips.sort(() => 0.5 - Math.random()).slice(0, 2);
+    randomTips.forEach((tip, index) => {
+      generatedNotifications.push({
+        id: generatedNotifications.length + index + 1,
+        type: "tip",
+        title: "Health Tip",
+        message: tip,
+        time: index === 0 ? "Just now" : "1 hour ago",
+        read: false,
+      });
+    });
+
+    setNotifications(generatedNotifications);
   }, []);
+
+  const dismissNotification = (id: number) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -198,12 +277,88 @@ const Dashboard = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button variant="outline" size="icon">
-                  <Bell className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Settings className="w-4 h-4" />
-                </Button>
+                <div className="relative">
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                  >
+                    <Bell className="w-4 h-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                  
+                  {/* Notifications Dropdown */}
+                  {showNotifications && (
+                    <div className="absolute right-0 top-12 w-80 md:w-96 bg-card border border-border rounded-xl shadow-lg z-50 max-h-96 overflow-hidden">
+                      <div className="p-4 border-b border-border flex items-center justify-between">
+                        <h3 className="font-semibold text-foreground">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+                            Mark all as read
+                          </Button>
+                        )}
+                      </div>
+                      <div className="max-h-72 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-4 text-center text-muted-foreground">
+                            No notifications
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <div
+                              key={notification.id}
+                              className={`p-4 border-b border-border hover:bg-muted/50 transition-colors ${
+                                !notification.read ? "bg-primary/5" : ""
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                  notification.type === "reminder" 
+                                    ? "bg-primary/10 text-primary" 
+                                    : "bg-secondary/10 text-secondary"
+                                }`}>
+                                  {notification.type === "reminder" ? (
+                                    <Calendar className="w-4 h-4" />
+                                  ) : (
+                                    <Lightbulb className="w-4 h-4" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-foreground">
+                                    {notification.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                    {notification.message}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {notification.time}
+                                  </p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => dismissNotification(notification.id)}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <Link to="/profile">
+                  <Button variant="outline" size="icon">
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -247,6 +402,51 @@ const Dashboard = () => {
                 <div>
                   <p className="text-2xl font-bold text-foreground">{activeOrdersCount}</p>
                   <p className="text-sm text-muted-foreground">Active Orders</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Quick Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-8"
+          >
+            <h2 className="text-xl font-semibold text-foreground mb-4">Quick Access</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {quickLinks.map((link) => (
+                <Link key={link.name} to={link.path}>
+                  <div className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer">
+                    <div className={`w-10 h-10 rounded-lg ${link.color} flex items-center justify-center mb-3`}>
+                      <link.icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-medium text-foreground text-sm">{link.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{link.description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Health Tips Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            className="mb-8"
+          >
+            <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border border-border rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Daily Health Tip</h3>
+                  <p className="text-muted-foreground">
+                    {healthTips[Math.floor(Math.random() * healthTips.length)]}
+                  </p>
                 </div>
               </div>
             </div>
