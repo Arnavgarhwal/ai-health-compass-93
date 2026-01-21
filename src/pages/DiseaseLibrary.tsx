@@ -6,19 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { diseases, categories } from "@/data/mockData";
+import { allDiseases, diseaseCategories } from "@/data/diseases";
 
 const DiseaseLibrary = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedDisease, setSelectedDisease] = useState<typeof diseases[0] | null>(null);
+  const [selectedDisease, setSelectedDisease] = useState<typeof allDiseases[0] | null>(null);
 
-  const filteredDiseases = diseases.filter(disease => {
+  const filteredDiseases = allDiseases.filter(disease => {
     const matchesSearch = disease.name.toLowerCase().includes(search.toLowerCase()) ||
       disease.symptoms.some(s => s.toLowerCase().includes(search.toLowerCase()));
     const matchesCategory = selectedCategory === "All" || disease.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }).slice(0, 100); // Show first 100 results for performance
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,7 +59,7 @@ const DiseaseLibrary = () => {
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {categories.map(cat => (
+              {diseaseCategories.map(cat => (
                 <Button
                   key={cat}
                   variant={selectedCategory === cat ? "default" : "outline"}
