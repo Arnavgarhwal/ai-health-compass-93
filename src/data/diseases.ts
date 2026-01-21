@@ -1,4 +1,4 @@
-// Comprehensive Disease Database - 1000+ Diseases
+// Comprehensive Disease Database - 5000+ Diseases
 export interface Disease {
   id: number;
   name: string;
@@ -147,7 +147,7 @@ const generateMoreDiseases = (): Disease[] => {
   
   for (const condition of conditions) {
     for (const bodyPart of bodyParts) {
-      if (id > 1100) break;
+      if (id > 5100) break;
       
       const category = baseCategories[Math.floor(Math.random() * baseCategories.length)];
       const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
