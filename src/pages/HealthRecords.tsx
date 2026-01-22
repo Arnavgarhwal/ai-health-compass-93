@@ -16,6 +16,7 @@ import {
   X,
   Check,
   Filter,
+  FileDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
+import { exportHealthRecords } from "@/utils/exportData";
 
 interface HealthRecord {
   id: number;
@@ -282,6 +284,19 @@ const HealthRecords = () => {
                 className="pl-10 h-12"
               />
             </div>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                exportHealthRecords(records);
+                toast({
+                  title: "Export Complete",
+                  description: "Health records exported as CSV.",
+                });
+              }}
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
             <Button variant="hero" onClick={() => setShowUploadModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Upload Record
