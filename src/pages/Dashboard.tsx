@@ -20,6 +20,7 @@ import {
   Heart,
   Lightbulb,
   X,
+  BarChart3,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,7 @@ const quickLinks = [
   { name: "Medicine Reminders", icon: Pill, path: "/medicine-reminders", color: "bg-primary/10 text-primary", description: "Manage medications" },
   { name: "BMI Calculator", icon: Calculator, path: "/bmi-calculator", color: "bg-secondary/10 text-secondary", description: "Check your BMI" },
   { name: "Nearby Hospitals", icon: MapPin, path: "/nearby-hospitals", color: "bg-accent text-accent-foreground", description: "Find hospitals" },
+  { name: "Health Reports", icon: BarChart3, path: "/health-dashboard", color: "bg-primary/10 text-primary", description: "View health trends" },
 ];
 
 const healthTips = [

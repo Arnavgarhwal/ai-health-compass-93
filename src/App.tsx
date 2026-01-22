@@ -20,6 +20,7 @@ import EmergencySOS from "./pages/EmergencySOS";
 import MedicineReminder from "./pages/MedicineReminder";
 import BMICalculator from "./pages/BMICalculator";
 import NearbyHospitals from "./pages/NearbyHospitals";
+import HealthDashboard from "./pages/HealthDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/medicine-reminders" element={<MedicineReminder />} />
           <Route path="/bmi-calculator" element={<BMICalculator />} />
           <Route path="/nearby-hospitals" element={<NearbyHospitals />} />
+          <Route path="/health-dashboard" element={<HealthDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

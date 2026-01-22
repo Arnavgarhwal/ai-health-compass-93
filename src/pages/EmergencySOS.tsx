@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Phone,
@@ -15,12 +15,16 @@ import {
   Edit2,
   Save,
   X,
+  Smartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
+import { useFallDetection } from "@/hooks/useFallDetection";
+import FallDetectionOverlay from "@/components/FallDetectionOverlay";
 
 interface EmergencyContact {
   id: string;
@@ -89,6 +93,33 @@ const EmergencySOS = () => {
     relation: "",
   });
   const [sosActive, setSosActive] = useState(false);
+  const [fallDetectionEnabled, setFallDetectionEnabled] = useState(false);
+
+  // Fall detection callback
+  const handleFallSOS = useCallback((location: { lat: number; lng: number } | null) => {
+    toast({
+      title: "🚨 Emergency SOS Triggered!",
+      description: location 
+        ? `Location: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}` 
+        : "Calling emergency services...",
+      variant: "destructive",
+    });
+    
+    // Call emergency number
+    setTimeout(() => {
+      window.location.href = 'tel:112';
+    }, 1000);
+  }, []);
+
+  const {
+    isFallDetected,
+    countdown,
+    location,
+    dismissFall,
+    triggerFallDetection,
+    startMonitoring,
+    stopMonitoring,
+  } = useFallDetection(handleFallSOS);
 
   useEffect(() => {
     const saved = localStorage.getItem("wellsync-emergency-contacts");
@@ -98,7 +129,33 @@ const EmergencySOS = () => {
       setContacts(defaultContacts);
       localStorage.setItem("wellsync-emergency-contacts", JSON.stringify(defaultContacts));
     }
-  }, []);
+
+    // Load fall detection preference
+    const fallDetectionPref = localStorage.getItem("wellsync-fall-detection");
+    if (fallDetectionPref === "true") {
+      setFallDetectionEnabled(true);
+      startMonitoring();
+    }
+  }, [startMonitoring]);
+
+  const toggleFallDetection = (enabled: boolean) => {
+    setFallDetectionEnabled(enabled);
+    localStorage.setItem("wellsync-fall-detection", enabled.toString());
+    
+    if (enabled) {
+      startMonitoring();
+      toast({
+        title: "Fall Detection Enabled",
+        description: "Your device will monitor for sudden falls.",
+      });
+    } else {
+      stopMonitoring();
+      toast({
+        title: "Fall Detection Disabled",
+        description: "Fall monitoring has been turned off.",
+      });
+    }
+  };
 
   const saveContacts = (updated: EmergencyContact[]) => {
     setContacts(updated);
@@ -176,6 +233,14 @@ const EmergencySOS = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      
+      {/* Fall Detection Overlay */}
+      <FallDetectionOverlay
+        isVisible={isFallDetected}
+        countdown={countdown}
+        location={location}
+        onDismiss={dismissFall}
+      />
 
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
@@ -195,6 +260,48 @@ const EmergencySOS = () => {
             <p className="text-muted-foreground">
               Quick access to emergency services and nearby hospitals
             </p>
+          </motion.div>
+
+          {/* Fall Detection Toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-8 bg-card border border-border rounded-xl p-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Smartphone className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Fall Detection</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically detect falls and trigger SOS
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => triggerFallDetection()}
+                  className="text-xs"
+                >
+                  Test Fall
+                </Button>
+                <Switch
+                  checked={fallDetectionEnabled}
+                  onCheckedChange={toggleFallDetection}
+                />
+              </div>
+            </div>
+            {fallDetectionEnabled && (
+              <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Fall detection is active and monitoring
+              </p>
+            )}
           </motion.div>
 
           {/* SOS Button */}
