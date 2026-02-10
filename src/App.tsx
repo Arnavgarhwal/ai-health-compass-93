@@ -21,6 +21,8 @@ import MedicineReminder from "./pages/MedicineReminder";
 import BMICalculator from "./pages/BMICalculator";
 import NearbyHospitals from "./pages/NearbyHospitals";
 import HealthDashboard from "./pages/HealthDashboard";
+import HealthGoals from "./pages/HealthGoals";
+import VideoConsultation from "./pages/VideoConsultation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +52,8 @@ const App = () => (
           <Route path="/bmi-calculator" element={<BMICalculator />} />
           <Route path="/nearby-hospitals" element={<NearbyHospitals />} />
           <Route path="/health-dashboard" element={<HealthDashboard />} />
+          <Route path="/health-goals" element={<HealthGoals />} />
+          <Route path="/video-consultation" element={<VideoConsultation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
