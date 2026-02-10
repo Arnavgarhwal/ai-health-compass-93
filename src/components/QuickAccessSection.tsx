@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { 
   Phone, Pill, Calculator, MapPin, Heart, Users, FileText, 
-  Activity, Stethoscope, BookOpen, ShoppingBag, Brain, Calendar
+  Activity, Stethoscope, BookOpen, ShoppingBag, Brain, Calendar,
+  Target, Video, ClipboardList
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -102,6 +103,30 @@ const quickLinks = [
     href: "/diagnostics",
     color: "from-rose-500 to-pink-600",
     bgColor: "bg-rose-50 dark:bg-rose-950/30"
+  },
+  {
+    title: "Health Goals",
+    description: "Track fitness objectives",
+    icon: Target,
+    href: "/health-goals",
+    color: "from-lime-500 to-green-600",
+    bgColor: "bg-lime-50 dark:bg-lime-950/30"
+  },
+  {
+    title: "Video Consultation",
+    description: "Talk to doctors live",
+    icon: Video,
+    href: "/video-consultation",
+    color: "from-sky-500 to-blue-600",
+    bgColor: "bg-sky-50 dark:bg-sky-950/30"
+  },
+  {
+    title: "Prescriptions",
+    description: "Create & manage Rx",
+    icon: ClipboardList,
+    href: "/prescriptions",
+    color: "from-orange-500 to-red-600",
+    bgColor: "bg-orange-50 dark:bg-orange-950/30"
   },
 ];
 

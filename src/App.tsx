@@ -23,6 +23,7 @@ import NearbyHospitals from "./pages/NearbyHospitals";
 import HealthDashboard from "./pages/HealthDashboard";
 import HealthGoals from "./pages/HealthGoals";
 import VideoConsultation from "./pages/VideoConsultation";
+import Prescriptions from "./pages/Prescriptions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/health-dashboard" element={<HealthDashboard />} />
           <Route path="/health-goals" element={<HealthGoals />} />
           <Route path="/video-consultation" element={<VideoConsultation />} />
+          <Route path="/prescriptions" element={<Prescriptions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
