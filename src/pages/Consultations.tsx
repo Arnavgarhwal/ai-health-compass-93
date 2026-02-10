@@ -4,16 +4,21 @@ import { Search, Star, Clock, Video, MessageSquare, Calendar, Check, Globe } fro
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { doctors, specialties, timeSlots } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 
 const Consultations = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("All");
   const [selectedDoctor, setSelectedDoctor] = useState<typeof doctors[0] | null>(null);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [consultationType, setConsultationType] = useState<"video" | "chat">("video");
 
@@ -34,7 +39,7 @@ const Consultations = () => {
   });
 
   const handleBookAppointment = () => {
-    if (!selectedDate || !selectedTime) {
+    if (!selectedCalendarDate || !selectedTime) {
       toast({
         title: "Select Date & Time",
         description: "Please select a date and time slot for your consultation.",
@@ -45,10 +50,10 @@ const Consultations = () => {
 
     toast({
       title: "Appointment Booked! 🎉",
-      description: `Your ${consultationType} consultation with ${selectedDoctor?.name} is scheduled for ${selectedDate} at ${selectedTime}.`
+      description: `Your ${consultationType} consultation with ${selectedDoctor?.name} is scheduled for ${format(selectedCalendarDate, "PPP")} at ${selectedTime}.`
     });
     setSelectedDoctor(null);
-    setSelectedDate("");
+    setSelectedCalendarDate(undefined);
     setSelectedTime("");
   };
 
@@ -206,22 +211,27 @@ const Consultations = () => {
                 </div>
               </div>
 
-              {/* Date Selection */}
+              {/* Date Selection with Calendar */}
               <div>
                 <h3 className="font-semibold mb-3">Select Date</h3>
-                <div className="grid grid-cols-7 gap-2">
-                  {dates.map(date => (
-                    <Button
-                      key={date.full}
-                      variant={selectedDate === date.full ? "default" : "outline"}
-                      className="flex flex-col h-auto py-2"
-                      onClick={() => setSelectedDate(date.full)}
-                    >
-                      <span className="text-xs">{date.day}</span>
-                      <span className="text-lg font-bold">{date.date}</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      {selectedCalendarDate ? format(selectedCalendarDate, "PPP") : "Pick a date"}
                     </Button>
-                  ))}
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarPicker
+                      mode="single"
+                      selected={selectedCalendarDate}
+                      onSelect={setSelectedCalendarDate}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Time Selection */}
@@ -259,6 +269,11 @@ const Consultations = () => {
               <Button variant="hero" className="w-full" size="lg" onClick={handleBookAppointment}>
                 <Calendar className="w-4 h-4 mr-2" /> Confirm Appointment
               </Button>
+              {consultationType === "video" && (
+                <Button variant="outline" className="w-full" size="lg" onClick={() => navigate("/video-consultation")}>
+                  <Video className="w-4 h-4 mr-2" /> Join Video Consultation
+                </Button>
+              )}
             </div>
           </motion.div>
         </motion.div>
