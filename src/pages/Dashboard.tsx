@@ -24,6 +24,7 @@ import {
   Target,
   Video,
   ClipboardList,
+  History,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,7 @@ const quickLinks = [
   { name: "Health Goals", icon: Target, path: "/health-goals", color: "bg-secondary/10 text-secondary", description: "Track fitness goals" },
   { name: "Video Consult", icon: Video, path: "/video-consultation", color: "bg-accent text-accent-foreground", description: "Talk to a doctor" },
   { name: "Prescriptions", icon: ClipboardList, path: "/prescriptions", color: "bg-primary/10 text-primary", description: "Manage prescriptions" },
+  { name: "Health Timeline", icon: History, path: "/patient-timeline", color: "bg-secondary/10 text-secondary", description: "View patient history" },
 ];
 
 const healthTips = [

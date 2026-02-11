@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { symptomResponses, commonSymptoms } from "@/data/symptoms";
+import PainDetector from "@/components/PainDetector";
 
 interface Message {
   id: number;
@@ -93,6 +94,22 @@ const SymptomAnalyzer = () => {
     setInput(`I'm experiencing ${symptom.toLowerCase()}`);
   };
 
+  const handlePainDetected = (symptomText: string) => {
+    setInput(symptomText);
+    // Auto-send after a brief delay
+    setTimeout(() => {
+      const userMessage: Message = { id: messages.length + 1, type: "user", content: symptomText };
+      setMessages(prev => [...prev, userMessage]);
+      setIsTyping(true);
+      setTimeout(() => {
+        const analysis = analyzeSymptoms(symptomText);
+        setMessages(prev => [...prev, { id: prev.length + 1, type: "bot", content: "Based on your symptoms, here's my analysis:", analysis }]);
+        setIsTyping(false);
+      }, 1500);
+      setInput("");
+    }, 300);
+  };
+
   const handleReset = () => {
     setMessages([{
       id: 1,
@@ -124,6 +141,9 @@ const SymptomAnalyzer = () => {
               Describe your symptoms for an AI-powered preliminary assessment
             </p>
           </motion.div>
+
+          {/* AI Pain Area Detector */}
+          <PainDetector onSymptomDetected={handlePainDetected} />
 
           {/* Quick Symptoms */}
           <div className="flex flex-wrap gap-2 justify-center mb-6">

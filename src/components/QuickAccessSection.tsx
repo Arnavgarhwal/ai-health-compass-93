@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { 
   Phone, Pill, Calculator, MapPin, Heart, Users, FileText, 
   Activity, Stethoscope, BookOpen, ShoppingBag, Brain, Calendar,
-  Target, Video, ClipboardList
+  Target, Video, ClipboardList, Clock
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -127,6 +127,14 @@ const quickLinks = [
     href: "/prescriptions",
     color: "from-orange-500 to-red-600",
     bgColor: "bg-orange-50 dark:bg-orange-950/30"
+  },
+  {
+    title: "Health Timeline",
+    description: "View patient history",
+    icon: Clock,
+    href: "/patient-timeline",
+    color: "from-slate-500 to-gray-600",
+    bgColor: "bg-slate-50 dark:bg-slate-950/30"
   },
 ];
 
