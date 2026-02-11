@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { FileText, Plus, Trash2, Printer, Download, User, Calendar, Pill, ClipboardList, Building2, Send } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, Plus, Trash2, Printer, Download, User, Calendar, Pill, ClipboardList, Building2, Send, AlertTriangle, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
+import { checkInteractions, type DrugInteraction } from "@/data/drugInteractions";
 
 interface Medicine {
   name: string;
@@ -58,6 +59,12 @@ const Prescriptions = () => {
   const addMedicine = () => {
     setForm(p => ({ ...p, medicines: [...p.medicines, { name: "", dosage: "", frequency: "Twice daily", duration: "7 days", instructions: "" }] }));
   };
+
+  // Drug interaction checker
+  const interactions = useMemo(() => {
+    const names = form.medicines.map(m => m.name).filter(Boolean);
+    return names.length >= 2 ? checkInteractions(names) : [];
+  }, [form.medicines]);
 
   const removeMedicine = (index: number) => {
     setForm(p => ({ ...p, medicines: p.medicines.filter((_, i) => i !== index) }));
@@ -252,6 +259,38 @@ const Prescriptions = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Drug Interaction Warnings */}
+              <AnimatePresence>
+                {interactions.length > 0 && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                    className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldAlert className="w-5 h-5 text-destructive" />
+                      <h3 className="font-semibold text-destructive">⚠️ Drug Interaction Warnings ({interactions.length})</h3>
+                    </div>
+                    {interactions.map((inter, idx) => (
+                      <div key={idx} className={`rounded-xl p-4 border ${
+                        inter.severity === "severe" ? "bg-destructive/10 border-destructive/30" :
+                        inter.severity === "moderate" ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700" :
+                        "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-700"
+                      }`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <AlertTriangle className={`w-4 h-4 ${
+                            inter.severity === "severe" ? "text-destructive" : "text-amber-600 dark:text-amber-400"
+                          }`} />
+                          <Badge variant={inter.severity === "severe" ? "destructive" : "secondary"} className="capitalize text-xs">
+                            {inter.severity}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">{inter.drugs.join(" + ")}</span>
+                        </div>
+                        <p className="text-sm font-medium">{inter.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1">💡 {inter.recommendation}</p>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Notes & Follow-up */}
               <div className="grid md:grid-cols-2 gap-4">

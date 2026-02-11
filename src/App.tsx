@@ -24,6 +24,7 @@ import HealthDashboard from "./pages/HealthDashboard";
 import HealthGoals from "./pages/HealthGoals";
 import VideoConsultation from "./pages/VideoConsultation";
 import Prescriptions from "./pages/Prescriptions";
+import PatientTimeline from "./pages/PatientTimeline";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="/health-goals" element={<HealthGoals />} />
           <Route path="/video-consultation" element={<VideoConsultation />} />
           <Route path="/prescriptions" element={<Prescriptions />} />
+          <Route path="/patient-timeline" element={<PatientTimeline />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
