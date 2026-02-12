@@ -4,6 +4,7 @@ import { Camera, CameraOff, Hand, AlertTriangle, Pill, ShieldCheck, X, MousePoin
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { bodyPainAreas, detectPainArea, type PainArea } from "@/data/bodyPainMap";
+import BodyModel3D from "./BodyModel3D";
 
 interface PainDetectorProps {
   onSymptomDetected?: (symptom: string) => void;
@@ -13,16 +14,16 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
   const [mode, setMode] = useState<"idle" | "camera" | "manual">("idle");
   const [cameraActive, setCameraActive] = useState(false);
   const [selectedArea, setSelectedArea] = useState<PainArea | null>(null);
-  const [hoveredArea, setHoveredArea] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [fingerPosition, setFingerPosition] = useState<{ x: number; y: number } | null>(null);
 
   const startCamera = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480 } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        await videoRef.current.play();
         setCameraActive(true);
         setMode("camera");
       }
@@ -43,7 +44,6 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
     return () => stopCamera();
   }, [stopCamera]);
 
-  // Simulate finger detection on camera feed - when user touches the canvas over the video
   const handleCameraTouch = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -60,23 +60,26 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
     const y = clientY - rect.top;
     setFingerPosition({ x, y });
 
-    // Draw finger indicator
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Draw circle at finger position
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
       ctx.beginPath();
-      ctx.arc(x * (canvas.width / rect.width), y * (canvas.height / rect.height), 20, 0, Math.PI * 2);
+      ctx.arc(x * scaleX, y * scaleY, 20, 0, Math.PI * 2);
       ctx.strokeStyle = "#ef4444";
       ctx.lineWidth = 3;
       ctx.stroke();
       ctx.beginPath();
-      ctx.arc(x * (canvas.width / rect.width), y * (canvas.height / rect.height), 5, 0, Math.PI * 2);
+      ctx.arc(x * scaleX, y * scaleY, 5, 0, Math.PI * 2);
       ctx.fillStyle = "#ef4444";
       ctx.fill();
+      // Label
+      ctx.fillStyle = "#fff";
+      ctx.font = "12px sans-serif";
+      ctx.fillText("📍 Pain point", x * scaleX + 25, y * scaleY + 5);
     }
 
-    // Map to body area - use center region of camera for body mapping
     const area = detectPainArea(x, y, rect.width, rect.height);
     if (area) setSelectedArea(area);
   };
@@ -102,14 +105,14 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
           <Badge variant="secondary" className="text-xs">New</Badge>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Point at where it hurts using your camera, or tap on the body map to identify your pain area. Get instant precautions and medicine suggestions.
+          Point at where it hurts using your camera, or use the interactive 3D body map to identify your pain area.
         </p>
         <div className="flex gap-3">
           <Button variant="hero" onClick={startCamera}>
             <Camera className="w-4 h-4 mr-2" /> Use Camera
           </Button>
           <Button variant="outline" onClick={() => setMode("manual")}>
-            <MousePointer className="w-4 h-4 mr-2" /> Body Map
+            <MousePointer className="w-4 h-4 mr-2" /> 3D Body Map
           </Button>
         </div>
       </motion.div>
@@ -132,16 +135,21 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Camera / Body Map */}
         <div>
           {mode === "camera" ? (
             <div className="relative rounded-xl overflow-hidden bg-black aspect-[3/4]">
-              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-              <canvas ref={canvasRef} width={300} height={400}
+              <video ref={videoRef} autoPlay playsInline muted
+                className="w-full h-full object-cover" />
+              <canvas ref={canvasRef} width={640} height={480}
                 className="absolute inset-0 w-full h-full cursor-crosshair"
                 onClick={handleCameraTouch}
                 onTouchStart={handleCameraTouch}
               />
+              {!cameraActive && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                  <p className="text-white text-sm">Starting camera...</p>
+                </div>
+              )}
               {fingerPosition && (
                 <div className="absolute top-2 left-2">
                   <Badge className="bg-destructive text-destructive-foreground">
@@ -156,54 +164,11 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
               </div>
               <Button variant="destructive" size="sm"
                 className="absolute top-2 right-2" onClick={() => { stopCamera(); setMode("manual"); }}>
-                <CameraOff className="w-3 h-3 mr-1" /> Switch to Map
+                <CameraOff className="w-3 h-3 mr-1" /> Switch to 3D Map
               </Button>
             </div>
           ) : (
-            <div className="relative bg-muted/30 rounded-xl p-4 aspect-[3/4] border border-border">
-              <p className="text-xs text-center text-muted-foreground mb-2">Tap on a body area</p>
-              {/* SVG Body Outline */}
-              <svg viewBox="0 0 100 100" className="w-full h-full">
-                {/* Simple body silhouette */}
-                <ellipse cx="50" cy="8" rx="8" ry="8" fill="currentColor" opacity="0.15" />
-                <rect x="42" y="16" width="16" height="4" rx="2" fill="currentColor" opacity="0.1" />
-                <rect x="36" y="20" width="28" height="20" rx="4" fill="currentColor" opacity="0.1" />
-                <rect x="20" y="20" width="14" height="6" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="66" y="20" width="14" height="6" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="14" y="26" width="10" height="20" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="76" y="26" width="10" height="20" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="36" y="40" width="28" height="16" rx="2" fill="currentColor" opacity="0.1" />
-                <rect x="34" y="56" width="14" height="26" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="52" y="56" width="14" height="26" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="32" y="82" width="14" height="14" rx="3" fill="currentColor" opacity="0.1" />
-                <rect x="54" y="82" width="14" height="14" rx="3" fill="currentColor" opacity="0.1" />
-
-                {/* Interactive pain areas */}
-                {bodyPainAreas.map(area => (
-                  <rect key={area.id} x={area.x} y={area.y} width={area.width} height={area.height}
-                    rx="2" fill={selectedArea?.id === area.id ? "hsl(var(--destructive))" : hoveredArea === area.id ? "hsl(var(--primary))" : "transparent"}
-                    opacity={selectedArea?.id === area.id ? 0.4 : hoveredArea === area.id ? 0.3 : 0}
-                    stroke={hoveredArea === area.id || selectedArea?.id === area.id ? "hsl(var(--primary))" : "transparent"}
-                    strokeWidth="0.5"
-                    className="cursor-pointer transition-all"
-                    onMouseEnter={() => setHoveredArea(area.id)}
-                    onMouseLeave={() => setHoveredArea(null)}
-                    onClick={() => handleBodyClick(area)}
-                  />
-                ))}
-                {/* Labels for hovered */}
-                {hoveredArea && (() => {
-                  const area = bodyPainAreas.find(a => a.id === hoveredArea);
-                  if (!area) return null;
-                  return (
-                    <text x={area.x + area.width / 2} y={area.y - 1} textAnchor="middle"
-                      fontSize="2.5" fill="hsl(var(--primary))" fontWeight="bold">
-                      {area.name}
-                    </text>
-                  );
-                })()}
-              </svg>
-            </div>
+            <BodyModel3D onAreaClick={handleBodyClick} selectedArea={selectedArea} />
           )}
           {mode === "manual" && (
             <Button variant="outline" size="sm" className="mt-2 w-full" onClick={startCamera}>
@@ -276,7 +241,7 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
                 <div>
                   <Hand className="w-16 h-16 mx-auto mb-4 opacity-30" />
                   <p className="text-lg font-medium mb-2">
-                    {mode === "camera" ? "Tap on the camera feed where you feel pain" : "Tap on the body map"}
+                    {mode === "camera" ? "Tap on the camera feed where you feel pain" : "Click on the 3D body model"}
                   </p>
                   <p className="text-sm">AI will analyze the area and suggest medicines & precautions</p>
                 </div>

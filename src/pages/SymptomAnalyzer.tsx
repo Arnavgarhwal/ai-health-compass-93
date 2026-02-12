@@ -36,6 +36,11 @@ const SymptomAnalyzer = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -75,6 +80,7 @@ const SymptomAnalyzer = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     // Simulate AI response delay
     setTimeout(() => {
