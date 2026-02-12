@@ -10,7 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { doctors, specialties, timeSlots } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 
 const Consultations = () => {
@@ -151,6 +151,9 @@ const Consultations = () => {
                   <Button variant="hero" onClick={() => setSelectedDoctor(doctor)}>
                     Book Now
                   </Button>
+                  <Link to={`/doctor/${doctor.id}`}>
+                    <Button variant="ghost" size="sm" className="text-xs">View Profile</Button>
+                  </Link>
                 </div>
 
                 <div className="mt-3 flex items-center gap-2">
