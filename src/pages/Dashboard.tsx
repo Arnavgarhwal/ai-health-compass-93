@@ -26,6 +26,7 @@ import {
   ClipboardList,
   History,
   Award,
+  Watch,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,7 @@ const quickLinks = [
   { name: "Prescriptions", icon: ClipboardList, path: "/prescriptions", color: "bg-primary/10 text-primary", description: "Manage prescriptions" },
   { name: "Health Timeline", icon: History, path: "/patient-timeline", color: "bg-secondary/10 text-secondary", description: "View patient history" },
   { name: "Health Score", icon: Award, path: "/health-score", color: "bg-primary/10 text-primary", description: "Your wellness score" },
+  { name: "Wearable Sync", icon: Watch, path: "/wearable-sync", color: "bg-secondary/10 text-secondary", description: "Sync fitness devices" },
 ];
 
 const healthTips = [
