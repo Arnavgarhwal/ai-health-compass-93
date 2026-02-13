@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, CameraOff, Hand, AlertTriangle, Pill, ShieldCheck, X, MousePointer } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,14 +21,21 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
 
   const startCamera = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480 } });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        setCameraActive(true);
-        setMode("camera");
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().then(() => {
+            setCameraActive(true);
+            setMode("camera");
+          });
+        };
       }
-    } catch {
+    } catch (err) {
+      console.error("Camera error:", err);
+      toast({ title: "Camera Unavailable", description: "Could not access camera. Using 3D Body Map instead.", variant: "destructive" });
       setMode("manual");
     }
   }, []);

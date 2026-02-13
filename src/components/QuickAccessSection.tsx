@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { 
   Phone, Pill, Calculator, MapPin, Heart, Users, FileText, 
   Activity, Stethoscope, BookOpen, ShoppingBag, Brain, Calendar,
-  Target, Video, ClipboardList, Clock
+  Target, Video, ClipboardList, Clock, Watch
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -135,6 +135,14 @@ const quickLinks = [
     href: "/patient-timeline",
     color: "from-slate-500 to-gray-600",
     bgColor: "bg-slate-50 dark:bg-slate-950/30"
+  },
+  {
+    title: "Wearable Sync",
+    description: "Sync fitness devices",
+    icon: Watch,
+    href: "/wearable-sync",
+    color: "from-pink-500 to-fuchsia-600",
+    bgColor: "bg-pink-50 dark:bg-pink-950/30"
   },
 ];
 
