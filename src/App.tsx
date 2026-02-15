@@ -28,6 +28,7 @@ import PatientTimeline from "./pages/PatientTimeline";
 import HealthScore from "./pages/HealthScore";
 import DoctorProfile from "./pages/DoctorProfile";
 import WearableSync from "./pages/WearableSync";
+import DietTracker from "./pages/DietTracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
           <Route path="/health-score" element={<HealthScore />} />
           <Route path="/doctor/:id" element={<DoctorProfile />} />
           <Route path="/wearable-sync" element={<WearableSync />} />
+          <Route path="/diet-tracker" element={<DietTracker />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
