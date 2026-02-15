@@ -148,6 +148,21 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
             <div className="relative rounded-xl overflow-hidden bg-black aspect-[3/4]">
               <video ref={videoRef} autoPlay playsInline muted
                 className="w-full h-full object-cover" />
+              {/* Body outline overlay to help users align */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                {/* Head */}
+                <ellipse cx="50" cy="10" rx="10" ry="8" fill="none" stroke="rgba(34,211,238,0.4)" strokeWidth="0.5" strokeDasharray="2,2" />
+                {/* Neck */}
+                <rect x="46" y="17" width="8" height="4" fill="none" stroke="rgba(34,211,238,0.3)" strokeWidth="0.3" strokeDasharray="1,1" />
+                {/* Torso */}
+                <rect x="37" y="21" width="26" height="25" rx="3" fill="none" stroke="rgba(34,211,238,0.3)" strokeWidth="0.5" strokeDasharray="2,2" />
+                {/* Arms */}
+                <rect x="20" y="22" width="14" height="24" rx="4" fill="none" stroke="rgba(34,211,238,0.2)" strokeWidth="0.3" strokeDasharray="1,1" />
+                <rect x="66" y="22" width="14" height="24" rx="4" fill="none" stroke="rgba(34,211,238,0.2)" strokeWidth="0.3" strokeDasharray="1,1" />
+                {/* Legs */}
+                <rect x="38" y="50" width="10" height="35" rx="3" fill="none" stroke="rgba(34,211,238,0.2)" strokeWidth="0.3" strokeDasharray="1,1" />
+                <rect x="52" y="50" width="10" height="35" rx="3" fill="none" stroke="rgba(34,211,238,0.2)" strokeWidth="0.3" strokeDasharray="1,1" />
+              </svg>
               <canvas ref={canvasRef} width={640} height={480}
                 className="absolute inset-0 w-full h-full cursor-crosshair"
                 onClick={handleCameraTouch}
@@ -158,16 +173,16 @@ const PainDetector = ({ onSymptomDetected }: PainDetectorProps) => {
                   <p className="text-white text-sm">Starting camera...</p>
                 </div>
               )}
-              {fingerPosition && (
+              {selectedArea && (
                 <div className="absolute top-2 left-2">
-                  <Badge className="bg-destructive text-destructive-foreground">
-                    📍 Tap on your pain area
+                  <Badge className="bg-destructive text-destructive-foreground text-xs">
+                    📍 {selectedArea.name} detected
                   </Badge>
                 </div>
               )}
               <div className="absolute bottom-2 left-2 right-2 text-center">
                 <p className="text-xs text-white bg-black/60 rounded-lg px-2 py-1">
-                  Position yourself and tap where you feel pain
+                  Align yourself with the outline • Tap where you feel pain
                 </p>
               </div>
               <Button variant="destructive" size="sm"

@@ -144,6 +144,38 @@ const quickLinks = [
     color: "from-pink-500 to-fuchsia-600",
     bgColor: "bg-pink-50 dark:bg-pink-950/30"
   },
+  {
+    title: "Health Score",
+    description: "Your overall health rating",
+    icon: Activity,
+    href: "/health-score",
+    color: "from-emerald-500 to-teal-600",
+    bgColor: "bg-emerald-50 dark:bg-emerald-950/30"
+  },
+  {
+    title: "Diet Tracker",
+    description: "Log meals & track nutrition",
+    icon: Heart,
+    href: "/diet-tracker",
+    color: "from-orange-500 to-amber-600",
+    bgColor: "bg-orange-50 dark:bg-orange-950/30"
+  },
+  {
+    title: "Dashboard",
+    description: "Your health overview",
+    icon: Activity,
+    href: "/dashboard",
+    color: "from-blue-500 to-cyan-600",
+    bgColor: "bg-blue-50 dark:bg-blue-950/30"
+  },
+  {
+    title: "Blog",
+    description: "Health articles & tips",
+    icon: BookOpen,
+    href: "/blog",
+    color: "from-violet-500 to-indigo-600",
+    bgColor: "bg-violet-50 dark:bg-violet-950/30"
+  },
 ];
 
 const QuickAccessSection = () => {

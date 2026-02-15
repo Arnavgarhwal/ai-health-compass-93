@@ -17,7 +17,7 @@ export interface PainArea {
 export const bodyPainAreas: PainArea[] = [
   {
     id: "head", name: "Head", region: "upper",
-    x: 40, y: 2, width: 20, height: 12,
+    x: 35, y: 0, width: 30, height: 18,
     symptoms: ["Headache", "Migraine", "Dizziness", "Pressure"],
     possibleConditions: ["Tension Headache", "Migraine", "Sinusitis", "Cluster Headache"],
     recommendedMedicines: ["Paracetamol 500mg", "Ibuprofen 400mg", "Sumatriptan (for migraine)"],
